@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">
+	<select id="memberList"
+		resultType="com.example.springmvc.model.dto.MemberDTO">
+		SELECT * FROM member
+		ORDER BY name
+	</select>
+
+	<insert id="insertMember">
+		INSERT INTO member(userid, passwd, name, email)
+		VALUES(#{userid}, #{passwd}, #{name}, #{email})
+	</insert>
+
+	<select id="viewMember"
+		resultType="com.example.springmvc.model.dto.MemberDTO">
+		SELECT * FROM member
+		WHERE userid = #{userid}
+	</select>
+
+	<update id="updateMember">
+		UPDATE member SET passwd = #{passwd},
+		name = #{name},
+		email = #{email}
+		WHERE userid = #{userid}
+	</update>
+
+	<delete id="deleteMember">
+		DELETE FROM member
+		WHERE userid = #{userid}
+	</delete>
+
+	<select id="checkPw" resultType="int">
+		SELECT count(*) FROM member
+		WHERE userid = #{userid} AND passwd = #{passwd}
+	</select>
+</mapper>

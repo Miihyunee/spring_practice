@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+	<!-- Appenders -->
+	<appender name="console"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%highlight(%-5level)]
+				%logger{36} - %msg%n</pattern>
+			<outputPatternAsHeader>true</outputPatternAsHeader>
+		</encoder>
+	</appender>
+
+	<appender name="console-infolog"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<Pattern>%d %5p %m%n</Pattern>
+		</encoder>
+	</appender>
+
+	<!-- Logger -->
+	<!--log level 을 DEBUG로 해야 SQL 명령어가 콘솔에 출력 -->
+	<logger name="com.example.spring01" level="DEBUG"
+		appender-ref="console" />
+	<logger name="jdbc.sqlonly" level="INFO"
+		appender-ref="console-infolog" />
+	<logger name="jdbc.resultsettable" level="INFO"
+		appender-ref="console-infolog" />
+
+	<!-- Root Logger -->
+	<!-- 모든 라이브러리의 로그 레벨 -->
+	<root level="INFO">
+		<appender-ref ref="console" />
+	</root>
+</configuration>

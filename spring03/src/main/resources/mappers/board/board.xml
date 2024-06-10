@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+	<select id="list"
+		resultType="com.example.spring03.model.board.BoardDTO">
+		<include refid="paging_header" />
+		SELECT rownum, idx, title, contents, b.regdate, hit, name, (SELECT
+		COUNT(*) FROM reply WHERE board_idx = b.idx) cnt
+		FROM board b, member m
+		<include refid="search" />
+		ORDER BY idx DESC, regdate DESC
+		<include refid="paging_footer" />
+	</select>
+
+	<insert id="insert">
+		INSERT INTO board (idx, title, contents, writer)
+		VALUES ( board_seq.nextval, #{title}, #{contents}, #{writer})
+	</insert>
+
+	<select id="detail"
+		resultType="com.example.spring03.model.board.BoardDTO">
+		SELECT idx, title, contents, b.regdate, hit, name, writer
+		FROM board b, member m
+		WHERE b.writer = m.userid
+		AND idx = #{idx}
+	</select>
+	
+	<update id="increase_hit">
+		UPDATE board SET hit = hit + 1 WHERE idx = #{idx}
+	</update>
+	
+	<update id="update">
+		UPDATE board SET title = #{title}, contents = #{contents}
+		WHERE idx = #{idx}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM board WHERE idx = #{idx}
+	</delete>
+	
+	<select id="count" resultType="int">
+		SELECT COUNT(*) FROM board b, member m
+		<include refid="search" />
+	</select>
+	
+	<select id="list_attach" resultType="String">
+		SELECT file_name
+		FROM attach
+		WHERE board_idx = #{board_idx}
+		ORDER BY regdate
+	</select>
+	
+	<insert id="insert_attach">
+		INSERT INTO attach (file_name, board_idx)
+		VALUES(#{file_name}, board_seq.currval)
+	</insert>
+	
+	<insert id="update_attach">
+		INSERT INTO attach(file_name, board_idx)
+		VALUES(#{file_name}, #{idx})
+	</insert>
+	
+	<delete id="delete_attach">
+		DELETE FROM attach WHERE file_name = #{file_name}
+	</delete>
+	
+	<sql id="search">
+		<choose>
+			<when test="search_option == 'all'">
+				WHERE b.writer = m.userid
+				AND (name LIKE '%' || #{keyword} || '%'
+				OR contents LIKE '%' || #{keyword} || '%'
+				OR title LIKE '%' || #{keyword} || '%' )
+			</when>
+			<otherwise>
+				WHERE b.writer = m.userid
+				AND ${search_option} LIKE '%' || #{keyword} || '%'
+			</otherwise>
+		</choose>
+	</sql>
+	
+	<sql id="paging_header">
+		SELECT *
+		FROM (
+			SELECT rownum as rn, A.*
+			FROM (
+	</sql>
+	
+	<sql id="paging_footer">
+			) A
+		) WHERE rn BETWEEN #{start} AND #{end}
+	</sql>
+</mapper>
